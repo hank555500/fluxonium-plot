@@ -1,0 +1,27 @@
+import scqubits as sc
+import qutip as qu
+import numpy as np 
+import matplotlib.pyplot as plt
+
+fluxonium = sc.Fluxonium(EJ=5, EC=1.5, EL=0.15, flux=0.0, cutoff=100)
+flux_list = np.linspace(-0.5, 0.5, 100)
+
+data = fluxonium.get_matelements_vs_paramvals(operator = 'n_operator' ,param_name = 'flux', param_vals = flux_list, evals_count = 6)
+
+for i in range(5):
+    for j in range(5):
+        if j >= i:
+            plt.plot(flux_list, np.abs(data.matrixelem_table[:, i, j]), label = f'{i},{j}')
+
+# for level in range(3):
+#     plt.plot(flux_list, np.abs(data.matrixelem_table[:, level, level]), label=f'Level {level}')
+
+plt.xlabel(r'$\Phi_{\mathrm{ext}}/\Phi_0$')
+plt.ylabel(r'$\langle n \rangle$')
+plt.legend()
+plt.show()
+print(np.shape(fluxonium.n_operator()))
+###################################################################################################################
+#內建製圖
+# fig, ax = fluxonium.plot_matelem_vs_paramvals('n_operator', 'flux', flux_list, select_elems=4)
+# plt.show()
