@@ -1,5 +1,5 @@
 import scqubits as sc
-import qutip as qu
+import qutip as qt
 import numpy as np 
 import matplotlib.pyplot as plt
 ##################################################################################################################
