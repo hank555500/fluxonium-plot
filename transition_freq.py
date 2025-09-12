@@ -3,7 +3,7 @@ import qutip as qt
 import numpy as np 
 import matplotlib.pyplot as plt
 
-fluxonium = sc.Fluxonium(EJ = 5, EC = 1.5, EL = 0.150, flux = 0.0, cutoff = 100)
+fluxonium = sc.Fluxonium(EJ = 5, EC = 1.8, EL = 0.150, flux = 0.0, cutoff = 150)
 flux_list = np.linspace(-0.5, 0.5, 101)
 num_of_eigst = 4
 
