@@ -46,33 +46,23 @@ n_opr = qt.Qobj(fluxonium01.matrixelement_table('n_operator', evals_count=N_q))
 #begin state
 psi0 = qt.basis(N_q, 0)
 ##################################################################################################
-Rabi_03, Rabi_23 = 0.005 * np.pi * 2, 0.01 * np.pi * 2
+Rabi_03 = 0.01 * np.pi * 2
+Rabi_23 = Rabi_03 * 1
 amp_03, amp_23 = Rabi_03/abs(n_opr[0,3]), Rabi_23/abs(n_opr[2,3])
 H_evo = [H, [n_opr, amp_03 * pulse_03], [n_opr, amp_23 * pulse_23]]
-##################################################################################################
-results0 = qt.sesolve(H_evo, psi0, tlist, e_ops = qt.ket2dm(qt.basis(N_q, 0)))
-results1 = qt.sesolve(H_evo, psi0, tlist, e_ops = qt.ket2dm(qt.basis(N_q, 1)))
-results2 = qt.sesolve(H_evo, psi0, tlist, e_ops = qt.ket2dm(qt.basis(N_q, 2)))
-results3 = qt.sesolve(H_evo, psi0, tlist, e_ops = qt.ket2dm(qt.basis(N_q, 3)))
-pi_pulse_index = np.argmax(results2.expect[0])
-half_pi_pulse_index = np.argmin(np.abs(results2.expect[0]- results2.expect[0][pi_pulse_index] / 2))
-plt.plot(tlist, results2.expect[0])
-plt.scatter(tlist[pi_pulse_index], results2.expect[0][pi_pulse_index], color='black')
-plt.scatter(tlist[half_pi_pulse_index], results2.expect[0][half_pi_pulse_index], color='red')
-plt.show()
 ##################################################################################################
 e_ops_list = [qt.ket2dm(qt.basis(N_q, 0)), 
               qt.ket2dm(qt.basis(N_q, 1)), 
               qt.ket2dm(qt.basis(N_q, 2)), 
               qt.ket2dm(qt.basis(N_q, 3))]
-results = qt.sesolve(H_evo, psi0, tlist, e_ops = e_ops_list)
-
+# results = qt.sesolve(H_evo, psi0, tlist, e_ops = e_ops_list)
+# pi_pulse_index = np.argmax(results.expect[2])
+# half_pi_pulse_index = np.argmin(np.abs(results.expect[2][:pi_pulse_index]- results.expect[2][pi_pulse_index] / 2))
+# plt.plot(tlist, results.expect[2])
+# plt.scatter(tlist[pi_pulse_index], results.expect[2][pi_pulse_index], color='black')
+# plt.scatter(tlist[half_pi_pulse_index], results.expect[2][half_pi_pulse_index], color='red')
+# plt.show()
 # qt.plot_expectation_values(results)
 # plt.show()
 ##################################################################################################
-# for i in range(N_q):
-#     results = qt.sesolve(H_evo, psi0, tlist, e_ops = qt.ket2dm(qt.basis(N_q, i)))
-#     qt.plot_expectation_values(results)
-#     plt.grid()
-#     plt.show()
 ##################################################################################################

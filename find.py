@@ -24,7 +24,7 @@ def Gaussian_square(freq, flat, sig, phi_0=0, num_sig=2, time_step=None, norm=Tr
 
     return t_list, pulse*np.cos(2*np.pi*freq*t_list+phi_0)
 ##################################################################################################
-rabi_rate = np.linspace(0.5, 2, 100)
+rabi_rate = np.linspace(-0.5, 2, 200)
 EJ, EC, EL, phi_eA, N_q = 5.0, 1.5, 0.15, 0.0, 4 
 fluxonium01 = scq.Fluxonium(EC=EC, EL=EL, EJ=EJ, flux=phi_eA, cutoff=150, truncated_dim=N_q)
 flat, sig, phi_0, time_step, Delta = 200, 34.3, 0, 0.02, 0.0
@@ -38,19 +38,35 @@ e_ops_list = [qt.ket2dm(qt.basis(N_q, 0)),
               qt.ket2dm(qt.basis(N_q, 1)), 
               qt.ket2dm(qt.basis(N_q, 2)), 
               qt.ket2dm(qt.basis(N_q, 3))]
+mode = 2
+state0pop, state2pop, state3pop = [], [], []
+##################################################################################################
 
-for i in rabi_rate:
-    Rabi_03 = 0.001 * np.pi * 2
-    Rabi_23 = Rabi_03 * i
-    amp_03, amp_23 = Rabi_03/abs(n_opr[0,3]), Rabi_23/abs(n_opr[2,3])
-    H_evo = [H, [n_opr, amp_03 * pulse_03], [n_opr, amp_23 * pulse_23]]
-    results = qt.sesolve(H_evo, psi0, tlist, e_ops = e_ops_list)
+# for i in rabi_rate:
+#     Rabi_03 =  0.02 * np.pi * 2
+#     Rabi_23 = Rabi_03 * i 
+#     amp_03, amp_23 = Rabi_03/abs(n_opr[0,3]), Rabi_23/abs(n_opr[2,3])
+#     H_evo = [H, [n_opr, amp_03 * pulse_03], [n_opr, amp_23 * pulse_23]]
+#     results = qt.sesolve(H_evo, psi0, tlist, e_ops = e_ops_list)
+#     pi_pulse_index = np.argmax(results.expect[mode])
+#     half_pi_pulse_index = np.argmin(np.abs(results.expect[mode][:pi_pulse_index] - results.expect[mode][pi_pulse_index] / 2))
+#     state0pop.append(results.expect[0][half_pi_pulse_index])
+#     state2pop.append(results.expect[2][half_pi_pulse_index])
+#     state3pop.append(results.expect[3][half_pi_pulse_index])
 
-    pi_pulse_index = np.argmax(results.expect[2])
-    half_pi_pulse_index = np.argmin(np.abs(results.expect[2]- results.expect[2][pi_pulse_index] / 2))
-    popu02 = results.expect[0][half_pi_pulse_index] + results.expect[0][half_pi_pulse_index]
-    popu23 = results.expect[0][half_pi_pulse_index] / results.expect[0][half_pi_pulse_index]
-    if popu02 > 0.99 and popu23 < 0.0001:
-        print(i)
-    else:
-        print('no!')
+#     # n = results.expect[0][half_pi_pulse_index] + results.expect[2][half_pi_pulse_index]
+#     # if results.expect[0][half_pi_pulse_index] > 0.46 and results.expect[2][half_pi_pulse_index] > 0.46:
+#     #     print(i, n, results.expect[3][half_pi_pulse_index])
+
+# fig, (ax0, ax2, ax3) = plt.subplots(3, 1, sharex=True)
+# ax0.plot(rabi_rate, state0pop)
+# ax0.set_title('population od 0 stae')
+# ax2.plot(rabi_rate, state2pop)
+# ax3.plot(rabi_rate, state3pop)
+
+# plt.show()
+##################################################################################################
+for i in rabi_rate :
+    Rabi_03 =  0.02 * np.pi * 2
+    Rabi_23 = Rabi_03 * i 
+
