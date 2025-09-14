@@ -24,7 +24,7 @@ def Gaussian_square(freq, flat, sig, phi_0=0, num_sig=2, time_step=None, norm=Tr
 
     return t_list, pulse*np.cos(2*np.pi*freq*t_list+phi_0)
 ##################################################################################################
-rabi_rate = np.linspace(-0.5, 2, 200)
+rabi_rate = np.linspace(0.0, 2, 100)
 EJ, EC, EL, phi_eA, N_q = 5.0, 1.5, 0.15, 0.0, 4 
 fluxonium01 = scq.Fluxonium(EC=EC, EL=EL, EJ=EJ, flux=phi_eA, cutoff=150, truncated_dim=N_q)
 flat, sig, phi_0, time_step, Delta = 200, 34.3, 0, 0.02, 0.0
@@ -39,7 +39,7 @@ e_ops_list = [qt.ket2dm(qt.basis(N_q, 0)),
               qt.ket2dm(qt.basis(N_q, 2)), 
               qt.ket2dm(qt.basis(N_q, 3))]
 mode = 2
-state0pop, state2pop, state3pop = [], [], []
+state0pop, state1pop, state2pop, state3pop = [], [], [], []
 ##################################################################################################
 
 # for i in rabi_rate:
@@ -69,4 +69,46 @@ state0pop, state2pop, state3pop = [], [], []
 for i in rabi_rate :
     Rabi_03 =  0.02 * np.pi * 2
     Rabi_23 = Rabi_03 * i 
+    amp_03, amp_23 = Rabi_03/abs(n_opr[0,3]), Rabi_23/abs(n_opr[2,3])
+    H_evo = [H, [n_opr, amp_03 * pulse_03], [n_opr, amp_23 * pulse_23]]
+    results = qt.sesolve(H_evo, psi0, tlist, e_ops = e_ops_list)
+    state0pop.append(np.array(results.expect[0]))
+    state1pop.append(np.array(results.expect[1]))
+    state2pop.append(np.array(results.expect[2]))
+    state3pop.append(np.array(results.expect[3]))
 
+plt.imshow(state0pop, aspect='auto', origin='lower',
+           extent=[tlist[0], tlist[-1], rabi_rate[0], rabi_rate[-1]],
+           cmap='viridis')
+plt.colorbar(label='Expectation Value')
+plt.xlabel('Time')
+plt.ylabel('Rabi Rate')
+plt.title('state 0')
+plt.show()
+
+plt.imshow(state1pop, aspect='auto', origin='lower',
+           extent=[tlist[0], tlist[-1], rabi_rate[0], rabi_rate[-1]],
+           cmap='viridis')
+plt.colorbar(label='Expectation Value')
+plt.xlabel('Time')
+plt.ylabel('Rabi Rate')
+plt.title('state 1')
+plt.show()
+
+plt.imshow(state2pop, aspect='auto', origin='lower',
+           extent=[tlist[0], tlist[-1], rabi_rate[0], rabi_rate[-1]],
+           cmap='viridis')
+plt.colorbar(label='Expectation Value')
+plt.xlabel('Time')
+plt.ylabel('Rabi Rate')
+plt.title('state 2')
+plt.show()
+
+plt.imshow(state3pop, aspect='auto', origin='lower',
+           extent=[tlist[0], tlist[-1], rabi_rate[0], rabi_rate[-1]],
+           cmap='viridis')
+plt.colorbar(label='Expectation Value')
+plt.xlabel('Time')
+plt.ylabel('Rabi Rate')
+plt.title('state 3')
+plt.show()
