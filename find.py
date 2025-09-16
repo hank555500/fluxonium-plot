@@ -2,32 +2,12 @@ import scqubits as scq
 import qutip as qt
 import numpy as np 
 import matplotlib.pyplot as plt
-#################################################################################################
-def Gaussian_square(freq, flat, sig, phi_0=0, num_sig=2, time_step=None, norm=True):
-    """
-    total duration = flat+sig*num_sig*2
-    norm: normalize gaussian edge to 0 and 1
-    unit: ns
-    """
-    if time_step==None:
-        time_step = 0.1/freq
-    t_list = np.linspace(0, flat+sig*num_sig*2, int((flat+sig*num_sig*2)/time_step)+1)
-    pulse = np.ones(len(t_list))
-    num_step = int(sig*num_sig/time_step)
-    gauss = np.exp(-(t_list-t_list[0])**2/(2*sig**2))
-    edge = gauss[:num_step]
-
-    if norm:
-        edge = (edge-edge.min()) / (edge.max()-edge.min())
-    pulse[         :num_step] = edge[::-1]
-    pulse[-num_step:        ] = edge
-
-    return t_list, pulse*np.cos(2*np.pi*freq*t_list+phi_0)
+from function import Gaussian_square
 ##################################################################################################
-rabi_rate = np.linspace(0.0, 2, 100)
+rabi_rate = np.linspace(0.0, 1, 101)
 EJ, EC, EL, phi_eA, N_q = 5.0, 1.5, 0.15, 0.0, 4 
 fluxonium01 = scq.Fluxonium(EC=EC, EL=EL, EJ=EJ, flux=phi_eA, cutoff=150, truncated_dim=N_q)
-flat, sig, phi_0, time_step, Delta = 200, 34.3, 0, 0.02, 0.0
+flat, sig, phi_0, time_step, Delta = 50.0, 34.3, 0, 0.02, 0.01
 evals = fluxonium01.eigenvals(evals_count=N_q)# - fluxonium01.eigenvals(evals_count=N_q)[0]
 tlist, pulse_03 = Gaussian_square((evals[3]-evals[0]-Delta)/(2*np.pi), flat, sig, phi_0=phi_0, num_sig=2, time_step=time_step, norm=True)
 tlist, pulse_23 = Gaussian_square((evals[3]-evals[2]-Delta)/(2*np.pi), flat, sig, phi_0=phi_0, num_sig=2, time_step=time_step, norm=True)
@@ -35,9 +15,9 @@ H = qt.Qobj(np.diag(evals))
 n_opr = qt.Qobj(fluxonium01.matrixelement_table('n_operator', evals_count=N_q))
 psi0 = qt.basis(N_q, 0)
 e_ops_list = [qt.ket2dm(qt.basis(N_q, 0)), 
-              qt.ket2dm(qt.basis(N_q, 1)), 
-              qt.ket2dm(qt.basis(N_q, 2)), 
-              qt.ket2dm(qt.basis(N_q, 3))]
+            qt.ket2dm(qt.basis(N_q, 1)), 
+            qt.ket2dm(qt.basis(N_q, 2)), 
+            qt.ket2dm(qt.basis(N_q, 3))]
 mode = 2
 state0pop, state1pop, state2pop, state3pop = [], [], [], []
 ##################################################################################################
@@ -77,38 +57,55 @@ for i in rabi_rate :
     state2pop.append(np.array(results.expect[2]))
     state3pop.append(np.array(results.expect[3]))
 
-plt.imshow(state0pop, aspect='auto', origin='lower',
-           extent=[tlist[0], tlist[-1], rabi_rate[0], rabi_rate[-1]],
-           cmap='viridis')
-plt.colorbar(label='Expectation Value')
-plt.xlabel('Time')
-plt.ylabel('Rabi Rate')
-plt.title('state 0')
-plt.show()
+fig, axs = plt.subplots(2, 2, figsize=(10, 8), sharex=True, sharey=True)
+imshows = []
+contour_levels = [0.5, 1.0]
 
-plt.imshow(state1pop, aspect='auto', origin='lower',
-           extent=[tlist[0], tlist[-1], rabi_rate[0], rabi_rate[-1]],
-           cmap='viridis')
-plt.colorbar(label='Expectation Value')
-plt.xlabel('Time')
-plt.ylabel('Rabi Rate')
-plt.title('state 1')
-plt.show()
+X, Y = np.meshgrid(tlist, rabi_rate)
 
-plt.imshow(state2pop, aspect='auto', origin='lower',
-           extent=[tlist[0], tlist[-1], rabi_rate[0], rabi_rate[-1]],
-           cmap='viridis')
-plt.colorbar(label='Expectation Value')
-plt.xlabel('Time')
-plt.ylabel('Rabi Rate')
-plt.title('state 2')
-plt.show()
+# State 0
+im0 = axs[0, 0].imshow(state0pop, aspect='auto', origin='lower',
+                    extent=[tlist[0], tlist[-1], rabi_rate[0], rabi_rate[-1]],
+                    cmap='cividis')
 
-plt.imshow(state3pop, aspect='auto', origin='lower',
-           extent=[tlist[0], tlist[-1], rabi_rate[0], rabi_rate[-1]],
-           cmap='viridis')
-plt.colorbar(label='Expectation Value')
-plt.xlabel('Time')
-plt.ylabel('Rabi Rate')
-plt.title('state 3')
+axs[0, 0].set_title('state 0')
+fig.colorbar(im0, ax=axs[0, 0])
+
+# State 1
+im1 = axs[0, 1].imshow(state1pop, aspect='auto', origin='lower',
+                    extent=[tlist[0], tlist[-1], rabi_rate[0], rabi_rate[-1]],
+                    cmap='cividis')
+
+c0 = axs[0, 1].contour(X, Y, state0pop, levels=contour_levels, colors='w', linewidths=1.5)
+# axs[0, 1].clabel(c0, fmt="%.1f", colors='w')
+
+c2 = axs[0, 1].contour(X, Y, state2pop, levels=contour_levels, colors='yellow', linewidths=1.5)
+# axs[0, 1].clabel(c2, fmt="%.1f", colors='yellow')
+
+c3 = axs[0, 1].contour(X, Y, state3pop, levels=[0.01], colors='red', linewidths=1.5)
+# axs[0, 1].clabel(c3, fmt="%.1f", colors='red')
+
+axs[0, 1].set_title('state 1')
+fig.colorbar(im1, ax=axs[0, 1])
+
+# State 2
+im2 = axs[1, 0].imshow(state2pop, aspect='auto', origin='lower',
+                    extent=[tlist[0], tlist[-1], rabi_rate[0], rabi_rate[-1]],
+                    cmap='cividis')
+axs[1, 0].set_title('state 2')
+fig.colorbar(im2, ax=axs[1, 0])
+
+# State 3
+im3 = axs[1, 1].imshow(state3pop, aspect='auto', origin='lower',
+                    extent=[tlist[0], tlist[-1], rabi_rate[0], rabi_rate[-1]],
+                    cmap='cividis')
+
+axs[1, 1].set_title('state 3')
+fig.colorbar(im3, ax=axs[1, 1])
+
+for ax in axs.flat:
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Rabi Rate')
+
+plt.tight_layout()
 plt.show()
