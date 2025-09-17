@@ -7,7 +7,7 @@ from function import Gaussian_square
 rabi_rate = np.linspace(0.0, 1, 101)
 EJ, EC, EL, phi_eA, N_q = 5.0, 1.5, 0.15, 0.0, 4 
 fluxonium01 = scq.Fluxonium(EC=EC, EL=EL, EJ=EJ, flux=phi_eA, cutoff=150, truncated_dim=N_q)
-flat, sig, phi_0, time_step, Delta = 50.0, 34.3, 0, 0.02, 0.01
+flat, sig, phi_0, time_step, Delta = 50.0, 36.3, 0, 0.02, 0.01
 evals = fluxonium01.eigenvals(evals_count=N_q)# - fluxonium01.eigenvals(evals_count=N_q)[0]
 tlist, pulse_03 = Gaussian_square((evals[3]-evals[0]-Delta)/(2*np.pi), flat, sig, phi_0=phi_0, num_sig=2, time_step=time_step, norm=True)
 tlist, pulse_23 = Gaussian_square((evals[3]-evals[2]-Delta)/(2*np.pi), flat, sig, phi_0=phi_0, num_sig=2, time_step=time_step, norm=True)
@@ -21,7 +21,6 @@ e_ops_list = [qt.ket2dm(qt.basis(N_q, 0)),
 mode = 2
 state0pop, state1pop, state2pop, state3pop = [], [], [], []
 ##################################################################################################
-
 # for i in rabi_rate:
 #     Rabi_03 =  0.02 * np.pi * 2
 #     Rabi_23 = Rabi_03 * i 
@@ -34,9 +33,9 @@ state0pop, state1pop, state2pop, state3pop = [], [], [], []
 #     state2pop.append(results.expect[2][half_pi_pulse_index])
 #     state3pop.append(results.expect[3][half_pi_pulse_index])
 
-#     # n = results.expect[0][half_pi_pulse_index] + results.expect[2][half_pi_pulse_index]
-#     # if results.expect[0][half_pi_pulse_index] > 0.46 and results.expect[2][half_pi_pulse_index] > 0.46:
-#     #     print(i, n, results.expect[3][half_pi_pulse_index])
+#     n = results.expect[0][half_pi_pulse_index] + results.expect[2][half_pi_pulse_index]
+#     if results.expect[0][half_pi_pulse_index] > 0.46 and results.expect[2][half_pi_pulse_index] > 0.46:
+#         print(i, n, results.expect[3][half_pi_pulse_index])
 
 # fig, (ax0, ax2, ax3) = plt.subplots(3, 1, sharex=True)
 # ax0.plot(rabi_rate, state0pop)
