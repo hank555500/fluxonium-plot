@@ -17,8 +17,8 @@ plt.legend()
 plt.show()
 # #################################################################################################################
 # #內建能階圖
-# fluxonium.plot_wavefunction(esys=None, which=range(6), mode='real')
-# plt.show()
-# #內建製普譜線圖
+fluxonium.plot_wavefunction(esys=None, which=range(5), mode='real')
+plt.show()
+#內建製普譜線圖
 fig, ax = fluxonium.plot_evals_vs_paramvals('flux', flux_list, evals_count=8, subtract_ground = True)
 plt.show()

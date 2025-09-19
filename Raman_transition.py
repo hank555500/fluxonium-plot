@@ -21,7 +21,7 @@ H = qt.Qobj(np.diag(evals))
 # n_operator 4*4 matrix
 n_opr = qt.Qobj(fluxonium01.matrixelement_table('n_operator', evals_count=N_q))
 #begin state
-psi0 = qt.basis(N_q, 2)
+psi0 = qt.basis(N_q, 0)
 ##################################################################################################
 Rabi_03 = 0.02 * np.pi * 2
 Rabi_23 = Rabi_03 * 0.4199
