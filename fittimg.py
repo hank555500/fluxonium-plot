@@ -15,7 +15,7 @@ optimal_flat, optimal_sig, optimal_rabi_rate = result.x
 print(f"最佳參數: flat = {optimal_flat:.4f}, sig = {optimal_sig:.4f}, rabi_rate = {optimal_rabi_rate:.4f}")
 print(f"均方誤差: {result.fun:.8e}")
 
-EJ, EC, EL, phi_eA, N_q = 5.0, 1.5, 0.15, 0.0, 4 
+EJ, EC, EL, phi_eA, N_q = 5.0, 1.5, 0.15, 0.0, 7
 fluxonium01 = scq.Fluxonium(EC=EC, EL=EL, EJ=EJ, flux=phi_eA, cutoff=150, truncated_dim=N_q)
 phi_0, time_step, Delta = 0, 0.02, 0.01
 evals = fluxonium01.eigenvals(evals_count=N_q)
@@ -24,11 +24,14 @@ tlist, pulse_23 = Gaussian_square((evals[3]-evals[2]-Delta)/(2*np.pi), optimal_f
 H = qt.Qobj(np.diag(evals))
 n_opr = qt.Qobj(fluxonium01.matrixelement_table('n_operator', evals_count=N_q))
 psi0 = qt.basis(N_q, 0)
-e_ops_list = [qt.ket2dm(qt.basis(N_q, 0)), qt.ket2dm(qt.basis(N_q, 1)), qt.ket2dm(qt.basis(N_q, 2)), qt.ket2dm(qt.basis(N_q, 3))]
+e_ops_list = [qt.ket2dm(qt.basis(N_q, i)) for i in range(N_q)]
 Rabi_03 =  0.02 * np.pi * 2
 Rabi_23 = Rabi_03 * optimal_rabi_rate
 amp_03, amp_23 = Rabi_03/abs(n_opr[0,3]), Rabi_23/abs(n_opr[2,3])
 H_evo = [H, [n_opr, amp_03 * pulse_03], [n_opr, amp_23 * pulse_23]]
 results = qt.sesolve(H_evo, psi0, tlist, e_ops = e_ops_list)
 print(results.expect[0][-1], results.expect[2][-1], results.expect[3][-1])
+qt.plot_expectation_values(results)
+plt.show()
+
 
